@@ -13,6 +13,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@maplibre/maplibre-react-native": "^11.2.1",
     "@route5/shared": "workspace:*",
     "expo": "~54.0.0",
     "expo-router": "~6.0.0",
@@ -22,6 +23,7 @@
     "react-native-screens": "^4.18.0"
   },
   "devDependencies": {
+    "@types/geojson": "^7946.0.16",
     "@types/react": "^19.1.12"
   }
 }

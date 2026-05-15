@@ -2,6 +2,7 @@ import { mockRouteCandidates } from "@route5/shared";
 import { useState } from "react";
 import { ScrollView, Text, View } from "react-native";
 import { RouteCandidateCard } from "../../components/route-candidate-card";
+import { RouteMap } from "../route-map/route-map";
 
 export function RoutePlannerScreen() {
   const [selectedRouteId, setSelectedRouteId] = useState(
@@ -30,9 +31,14 @@ export function RoutePlannerScreen() {
           今日の道を選ぶ
         </Text>
         <Text selectable style={{ color: "#526058", fontSize: 15 }}>
-          Phase 1 では仮のルート候補を5本表示しています。
+          Phase 3 では地図上に5本の仮ルートを表示しています。
         </Text>
       </View>
+
+      <RouteMap
+        routes={mockRouteCandidates}
+        selectedRouteId={selectedRouteId}
+      />
 
       <View style={{ gap: 12 }}>
         {mockRouteCandidates.map((route) => (

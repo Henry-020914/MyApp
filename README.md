@@ -38,3 +38,11 @@ Use `pnpm dev:mobile` to start Expo from the mobile package. Avoid using `pnpm e
 - The API exposes `POST /api/route-plans`.
 - A valid route plan request returns five mock `LineString` route candidates.
 - Invalid route plan input returns a `400` response.
+
+## Phase 3 Acceptance
+
+- The mobile app includes MapLibre React Native.
+- Expo config registers the MapLibre config plugin.
+- The Route5 home screen draws the five mock `LineString` routes on a map.
+- The selected route is highlighted above the muted route set.
+- MapLibre requires an Expo development build; it does not run in Expo Go.
