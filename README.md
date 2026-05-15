@@ -1,8 +1,8 @@
 # Route5
 
-Route5 is the Phase 1 foundation for a mobile app that will suggest five loop routes for walking, jogging, or running.
+Route5 is the foundation for a mobile app that will suggest five loop routes for walking, jogging, or running.
 
-This first phase intentionally uses mock route data. Real map rendering, OpenRouteService integration, Supabase/PostGIS persistence, route generation, saved routes, and feedback submission are later phases.
+The current implementation still uses mock route data. Real map rendering, OpenRouteService integration, Supabase/PostGIS persistence, route generation, saved routes, and feedback submission are later phases.
 
 ## Workspace
 
@@ -22,9 +22,19 @@ pnpm dev:api
 pnpm dev:mobile
 ```
 
+Use `pnpm dev:mobile` to start Expo from the mobile package. Avoid using `pnpm exec expo` from the repository root because it can miss the package-local Expo command on Windows.
+
 ## Phase 1 Acceptance
 
 - The mobile app has a Route5 home screen and shows five mock route candidates.
 - The API exposes `GET /api/health`.
 - Shared data is imported from `@route5/shared`.
 - `lint`, `typecheck`, and `test` run from the repository root.
+
+## Phase 2 Acceptance
+
+- `packages/shared` exports `RoutePlanRequest`, `RoutePlanResponse`, `RouteCandidate`, `RouteMetrics`, and `RouteScores`.
+- `packages/shared` exports a Zod schema for validating route plan requests.
+- The API exposes `POST /api/route-plans`.
+- A valid route plan request returns five mock `LineString` route candidates.
+- Invalid route plan input returns a `400` response.
