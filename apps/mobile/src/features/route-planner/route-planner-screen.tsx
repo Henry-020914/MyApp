@@ -31,7 +31,7 @@ export function RoutePlannerScreen() {
           今日の道を選ぶ
         </Text>
         <Text selectable style={{ color: "#526058", fontSize: 15 }}>
-          Phase 3 では地図上に5本の仮ルートを表示しています。
+          気分や歩きやすさで、今日の候補を比べます。
         </Text>
       </View>
 

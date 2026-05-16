@@ -15,4 +15,18 @@ describe("toRouteListItems", () => {
       "軽く走る朝ルート"
     ]);
   });
+
+  it("includes the Phase 4 comparison fields", () => {
+    const [firstItem] = toRouteListItems(mockRouteCandidates);
+
+    expect(firstItem).toMatchObject({
+      distance: "3.1 km",
+      duration: "38 min",
+      slope: "少なめ",
+      surface: "舗装路中心",
+      features: "公園 18% / 水辺 4%",
+      levelFit: "初心者向け",
+      cautions: ["安全を保証するものではありません"]
+    });
+  });
 });

@@ -46,3 +46,10 @@ Use `pnpm dev:mobile` to start Expo from the mobile package. Avoid using `pnpm e
 - The Route5 home screen draws the five mock `LineString` routes on a map.
 - The selected route is highlighted above the muted route set.
 - MapLibre requires an Expo development build; it does not run in Expo Go.
+
+## Phase 4 Acceptance
+
+- Route cards show distance, estimated duration, slope, surface, features, level fit, labels, and cautions.
+- Tapping a route card updates the selected route.
+- The selected route card has a visible selected state.
+- Card display labels are covered by unit tests.
