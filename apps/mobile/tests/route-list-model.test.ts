@@ -21,7 +21,7 @@ describe("toRouteListItems", () => {
 
     expect(firstItem).toMatchObject({
       distance: "3.1 km",
-      duration: "38 min",
+      duration: "約38分",
       slope: "少なめ",
       surface: "舗装路中心",
       features: "公園 18% / 水辺 4%",

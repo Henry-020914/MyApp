@@ -1,0 +1,99 @@
+import {
+  buildMockRoutePlanResponse,
+  type RoutePlanRequest
+} from "@route5/shared";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import {
+  createRoutePlan,
+  getRoute5ApiBaseUrl
+} from "../src/lib/route5-api";
+
+const routePlanRequest: RoutePlanRequest = {
+  origin: {
+    lat: 35.6812,
+    lng: 139.7671,
+    label: "東京駅"
+  },
+  target: {
+    type: "time",
+    value: 30,
+    unit: "min"
+  },
+  activity: "walk",
+  level: "beginner",
+  preferences: ["flat", "park"],
+  routeCount: 5,
+  locale: "ja-JP"
+};
+
+describe("route5 api client", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.unstubAllEnvs();
+  });
+
+  it("uses the Expo public API URL when provided", () => {
+    vi.stubEnv("EXPO_PUBLIC_ROUTE5_API_URL", "http://localhost:3000/");
+
+    expect(getRoute5ApiBaseUrl()).toBe("http://localhost:3000");
+  });
+
+  it("posts a route plan request and returns the response", async () => {
+    const responseBody = buildMockRoutePlanResponse(
+      routePlanRequest,
+      new Date("2026-05-16T00:00:00.000Z")
+    );
+    const fetchMock = vi.fn(async () => {
+      return new Response(JSON.stringify(responseBody), {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
+    });
+
+    vi.stubGlobal("fetch", fetchMock);
+
+    const response = await createRoutePlan(
+      routePlanRequest,
+      "http://127.0.0.1:3000"
+    );
+
+    expect(response.candidates).toHaveLength(5);
+    expect(fetchMock).toHaveBeenCalledWith(
+      "http://127.0.0.1:3000/api/route-plans",
+      expect.objectContaining({
+        method: "POST",
+        body: JSON.stringify(routePlanRequest)
+      })
+    );
+  });
+
+  it("throws a readable error for invalid API responses", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => {
+        return new Response(
+          JSON.stringify({
+            error: "invalid_route_plan_request",
+            message: "入力内容を確認してください。"
+          }),
+          {
+            status: 400,
+            headers: {
+              "Content-Type": "application/json"
+            }
+          }
+        );
+      })
+    );
+
+    await expect(
+      createRoutePlan(routePlanRequest, "http://127.0.0.1:3000")
+    ).rejects.toMatchObject({
+      message: "入力内容を確認してください。",
+      status: 400,
+      code: "invalid_route_plan_request"
+    });
+  });
+});

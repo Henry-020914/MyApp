@@ -1,4 +1,4 @@
-import type { MockRouteCandidate } from "@route5/shared";
+import type { RouteCandidate } from "@route5/shared";
 import { formatDistanceKm } from "@route5/shared";
 
 export type RouteCandidateCardDetails = {
@@ -12,7 +12,10 @@ export type RouteCandidateCardDetails = {
 
 const formatPercent = (value = 0) => `${Math.round(value * 100)}%`;
 
-export const getSlopeLabel = (route: MockRouteCandidate) => {
+const formatDurationFromSeconds = (durationSec: number) =>
+  `約${Math.round(durationSec / 60)}分`;
+
+export const getSlopeLabel = (route: RouteCandidate) => {
   const maxSlopePercent = route.metrics.maxSlopePercent ?? 0;
 
   if (route.metrics.ascentM <= 15 && maxSlopePercent <= 3.5) {
@@ -26,7 +29,7 @@ export const getSlopeLabel = (route: MockRouteCandidate) => {
   return "多め";
 };
 
-export const getSurfaceLabel = (route: MockRouteCandidate) => {
+export const getSurfaceLabel = (route: RouteCandidate) => {
   const pavedRatio = route.metrics.pavedRatio ?? 0;
 
   if (pavedRatio >= 0.9) {
@@ -40,7 +43,7 @@ export const getSurfaceLabel = (route: MockRouteCandidate) => {
   return "一部未舗装";
 };
 
-export const getLevelFitLabel = (route: MockRouteCandidate) => {
+export const getLevelFitLabel = (route: RouteCandidate) => {
   if (route.scores.levelFit >= 90) {
     return "初心者向け";
   }
@@ -53,10 +56,10 @@ export const getLevelFitLabel = (route: MockRouteCandidate) => {
 };
 
 export const toRouteCandidateCardDetails = (
-  route: MockRouteCandidate
+  route: RouteCandidate
 ): RouteCandidateCardDetails => ({
   distance: formatDistanceKm(route.distanceM),
-  duration: `約${route.estimatedDurationMin}分`,
+  duration: formatDurationFromSeconds(route.estimatedDurationSec),
   slope: getSlopeLabel(route),
   surface: getSurfaceLabel(route),
   features: `公園 ${formatPercent(route.metrics.parkRatio)} / 水辺 ${formatPercent(

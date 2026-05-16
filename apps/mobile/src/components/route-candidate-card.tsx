@@ -1,9 +1,9 @@
-import type { MockRouteCandidate } from "@route5/shared";
+import type { RouteCandidate } from "@route5/shared";
 import { Pressable, Text, View } from "react-native";
 import { toRouteCandidateCardDetails } from "./route-candidate-card-model";
 
 type RouteCandidateCardProps = {
-  route: MockRouteCandidate;
+  route: RouteCandidate;
   selected: boolean;
   onPress: () => void;
 };
@@ -45,7 +45,7 @@ export function RouteCandidateCard({
             {route.name}
           </Text>
           <Text selectable style={{ color: "#526058", fontSize: 14 }}>
-            {route.summary}
+            {route.description}
           </Text>
         </View>
 

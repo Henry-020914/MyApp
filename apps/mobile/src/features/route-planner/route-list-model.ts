@@ -1,5 +1,4 @@
-import type { MockRouteCandidate } from "@route5/shared";
-import { formatDistanceKm, formatDuration } from "@route5/shared";
+import type { RouteCandidate } from "@route5/shared";
 import { toRouteCandidateCardDetails } from "../../components/route-candidate-card-model";
 
 export type RouteListItem = {
@@ -17,7 +16,7 @@ export type RouteListItem = {
 };
 
 export const toRouteListItems = (
-  routes: MockRouteCandidate[]
+  routes: RouteCandidate[]
 ): RouteListItem[] =>
   routes.map((route) => {
     const details = toRouteCandidateCardDetails(route);
@@ -25,9 +24,9 @@ export const toRouteListItems = (
     return {
       id: route.id,
       title: route.name,
-      summary: route.summary,
-      distance: formatDistanceKm(route.distanceM),
-      duration: formatDuration(route.estimatedDurationMin),
+      summary: route.description,
+      distance: details.distance,
+      duration: details.duration,
       slope: details.slope,
       surface: details.surface,
       features: details.features,

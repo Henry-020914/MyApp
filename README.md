@@ -53,3 +53,12 @@ Use `pnpm dev:mobile` to start Expo from the mobile package. Avoid using `pnpm e
 - Tapping a route card updates the selected route.
 - The selected route card has a visible selected state.
 - Card display labels are covered by unit tests.
+
+## Phase 5 Acceptance
+
+- The mobile app has a route planner form for origin, distance/time, activity, level, and preferences.
+- Form values are converted into `RoutePlanRequest`.
+- Submitting the form calls `POST /api/route-plans`.
+- The returned candidates replace the map and card list.
+- Loading and error states are shown.
+- Form conversion and API client behavior are covered by unit tests.
