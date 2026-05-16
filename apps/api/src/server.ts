@@ -7,8 +7,10 @@ import type {
   RouteFeedbackRepository,
   RoutePlanRepository
 } from "./services/persistence";
+import type { RoutePlanResponseBuilder } from "./services/route-generation";
 
 export type BuildServerOptions = {
+  routeGenerationService?: RoutePlanResponseBuilder;
   routeFeedbackRepository?: RouteFeedbackRepository;
   routePlanRepository?: RoutePlanRepository;
 };
@@ -20,6 +22,7 @@ export const buildServer = async (options: BuildServerOptions = {}) => {
 
   await registerHealthRoute(app);
   await registerRoutePlanRoutes(app, {
+    routeGenerationService: options.routeGenerationService,
     routePlanRepository: options.routePlanRepository
   });
   await registerRouteFeedbackRoute(app, {

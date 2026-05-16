@@ -48,6 +48,20 @@ export type RouteGenerationPlan = {
   warnings: string[];
 };
 
+export type RoutePlanResponseBuilder = {
+  buildRoutePlanResponse(
+    request: RoutePlanRequest,
+    generatedAt?: Date
+  ): RoutePlanResponse | Promise<RoutePlanResponse>;
+};
+
+export class RouteGenerationProviderUnavailableError extends Error {
+  constructor(message = "外部ルーティングAPIへの接続に失敗しました。") {
+    super(message);
+    this.name = "RouteGenerationProviderUnavailableError";
+  }
+}
+
 type ScoreCandidateInput = {
   theme: RouteGenerationTheme;
   estimatedDistanceM: number;

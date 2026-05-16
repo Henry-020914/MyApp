@@ -117,3 +117,12 @@ Use `pnpm dev:mobile` to start Expo from the mobile package. Avoid using `pnpm e
 - Configured Supabase environments can call `save_route_feedback`.
 - The mobile app has a simple feedback panel for the selected route candidate.
 - Validation, API behavior, persistence behavior, API client behavior, and mobile request creation are covered by unit tests.
+
+## Phase 12 Acceptance
+
+- The route generation API has integration-style tests for valid input, invalid input, external provider failure, and fewer than five candidates.
+- The API can return a readable `503` response when route generation depends on an unavailable external provider.
+- The API still returns available candidates when fewer than five can be generated.
+- Route generation can be injected in tests without changing normal app behavior.
+- The mobile app has a selected route detail panel.
+- Mobile flow tests cover condition input, route generation response handling, route card selection, and selected route detail display.

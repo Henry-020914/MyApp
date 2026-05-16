@@ -1,12 +1,21 @@
 import type { FastifyInstance } from "fastify";
-import { routePlanRequestSchema } from "@route5/shared";
+import {
+  routePlanRequestSchema,
+  type RoutePlanRequest,
+  type RoutePlanResponse
+} from "@route5/shared";
 import {
   createRoutePlanRepositoryFromEnv,
   type RoutePlanRepository
 } from "../services/persistence";
-import { RouteGenerationService } from "../services/route-generation";
+import {
+  RouteGenerationProviderUnavailableError,
+  RouteGenerationService,
+  type RoutePlanResponseBuilder
+} from "../services/route-generation";
 
 export type RegisterRoutePlanRoutesOptions = {
+  routeGenerationService?: RoutePlanResponseBuilder;
   routePlanRepository?: RoutePlanRepository;
 };
 
@@ -14,7 +23,8 @@ export const registerRoutePlanRoutes = async (
   app: FastifyInstance,
   options: RegisterRoutePlanRoutesOptions = {}
 ) => {
-  const routeGenerationService = new RouteGenerationService();
+  const routeGenerationService =
+    options.routeGenerationService ?? new RouteGenerationService();
   const routePlanRepository =
     options.routePlanRepository ?? createRoutePlanRepositoryFromEnv();
 
@@ -32,9 +42,30 @@ export const registerRoutePlanRoutes = async (
       });
     }
 
-    const response = routeGenerationService.buildRoutePlanResponse(
-      validation.data
-    );
+    let response: RoutePlanResponse;
+
+    try {
+      response = await buildRoutePlanResponse(
+        routeGenerationService,
+        validation.data
+      );
+    } catch (error) {
+      if (error instanceof RouteGenerationProviderUnavailableError) {
+        return reply.status(503).send({
+          error: "route_provider_unavailable",
+          message:
+            "現在ルート生成が混み合っています。少し時間をおいて再試行してください。"
+        });
+      }
+
+      request.log.error({ error }, "Route plan generation failed.");
+
+      return reply.status(500).send({
+        error: "route_plan_generation_failed",
+        message: "ルート生成中に問題が起きました。"
+      });
+    }
+
     await routePlanRepository.saveRoutePlan({
       request: validation.data,
       response,
@@ -62,3 +93,8 @@ export const registerRoutePlanRoutes = async (
     }
   );
 };
+
+const buildRoutePlanResponse = (
+  routeGenerationService: RoutePlanResponseBuilder,
+  request: RoutePlanRequest
+) => Promise.resolve(routeGenerationService.buildRoutePlanResponse(request));

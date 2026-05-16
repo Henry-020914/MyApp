@@ -7,6 +7,7 @@ import { useState } from "react";
 import { ScrollView, Text, View } from "react-native";
 import { RouteCandidateCard } from "../../components/route-candidate-card";
 import { createRoutePlan, submitRouteFeedback } from "../../lib/route5-api";
+import { RouteDetailPanel } from "../route-detail/route-detail-panel";
 import { RouteFeedbackPanel } from "../route-feedback/route-feedback-panel";
 import { RouteMap } from "../route-map/route-map";
 import { RoutePlannerForm } from "./route-planner-form";
@@ -132,6 +133,8 @@ export function RoutePlannerScreen() {
         routes={routes}
         selectedRouteId={selectedRouteId}
       />
+
+      <RouteDetailPanel route={selectedRoute} />
 
       <View style={{ gap: 12 }}>
         {routes.map((route) => (
