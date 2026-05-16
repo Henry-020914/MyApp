@@ -71,3 +71,12 @@ Use `pnpm dev:mobile` to start Expo from the mobile package. Avoid using `pnpm e
 - The service creates scored skeleton loop candidates without calling an external API.
 - `POST /api/route-plans` returns five low-confidence skeleton candidates.
 - Target distance, candidate generation, scoring, and response creation are covered by unit tests.
+
+## Phase 7 Acceptance
+
+- The API has `OpenRouteServiceProvider` under `apps/api/src/services/providers/openrouteservice`.
+- The provider reads `ORS_API_KEY` and `ORS_BASE_URL` from backend environment variables.
+- The provider sends `foot-walking` GeoJSON directions requests.
+- Requests include `extra_info` for `steepness`, `surface`, `waytype`, `green`, and `noise`.
+- The API key is sent only in the backend request header, not in the URL or request body.
+- Provider request creation, response parsing, and error handling are covered by unit tests with mocked network calls.
