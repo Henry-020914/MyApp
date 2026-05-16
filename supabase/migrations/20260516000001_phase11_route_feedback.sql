@@ -10,12 +10,16 @@ begin
   select route_candidates.id
   into target_candidate_id
   from public.route_candidates
+  join public.route_plans
+    on route_plans.id = route_candidates.plan_id
   where route_candidates.candidate_id = input_feedback ->> 'routeCandidateId'
-  order by route_candidates.created_at desc
-  limit 1;
+    and route_plans.client_plan_id = input_feedback ->> 'planId'
+    and route_plans.access_token = input_feedback ->> 'accessToken';
 
   if target_candidate_id is null then
-    raise exception 'route candidate % was not found', input_feedback ->> 'routeCandidateId'
+    raise exception 'route candidate % was not found for plan %',
+      input_feedback ->> 'routeCandidateId',
+      input_feedback ->> 'planId'
       using errcode = 'P0002';
   end if;
 

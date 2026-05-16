@@ -25,6 +25,7 @@ export function RoutePlannerScreen() {
   const [formError, setFormError] = useState<string>();
   const [warnings, setWarnings] = useState<string[]>([]);
   const [planId, setPlanId] = useState<string>();
+  const [accessToken, setAccessToken] = useState<string>();
   const [submitting, setSubmitting] = useState(false);
   const [feedbackSubmitting, setFeedbackSubmitting] = useState(false);
   const [feedbackMessage, setFeedbackMessage] = useState<string>();
@@ -50,6 +51,7 @@ export function RoutePlannerScreen() {
       setSelectedRouteId(response.candidates[0]?.id);
       setWarnings(response.warnings);
       setPlanId(response.planId);
+      setAccessToken(response.accessToken);
       setFeedbackMessage(undefined);
       setFeedbackError(undefined);
     } catch (error) {
@@ -149,6 +151,8 @@ export function RoutePlannerScreen() {
 
       <RouteFeedbackPanel
         route={selectedRoute}
+        planId={planId}
+        accessToken={accessToken}
         submitting={feedbackSubmitting}
         message={feedbackMessage}
         error={feedbackError}

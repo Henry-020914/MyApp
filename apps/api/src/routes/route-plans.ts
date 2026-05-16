@@ -78,8 +78,20 @@ export const registerRoutePlanRoutes = async (
   app.get<{ Params: { planId: string } }>(
     "/api/route-plans/:planId",
     async (request, reply) => {
+      const accessToken = getRoutePlanAccessToken(
+        request.headers[routePlanAccessTokenHeader]
+      );
+
+      if (!accessToken) {
+        return reply.status(404).send({
+          error: "route_plan_not_found",
+          message: "Route plan was not found."
+        });
+      }
+
       const routePlan = await routePlanRepository.getRoutePlan(
-        request.params.planId
+        request.params.planId,
+        accessToken
       );
 
       if (!routePlan) {
@@ -98,3 +110,13 @@ const buildRoutePlanResponse = (
   routeGenerationService: RoutePlanResponseBuilder,
   request: RoutePlanRequest
 ) => Promise.resolve(routeGenerationService.buildRoutePlanResponse(request));
+
+export const routePlanAccessTokenHeader = "x-route5-plan-token";
+
+const getRoutePlanAccessToken = (
+  headerValue: string | string[] | undefined
+) => {
+  const value = Array.isArray(headerValue) ? headerValue[0] : headerValue;
+
+  return value?.trim();
+};

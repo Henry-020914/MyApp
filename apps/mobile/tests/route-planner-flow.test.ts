@@ -28,7 +28,8 @@ describe("route planner mobile flow", () => {
     const initialState = createInitialRoutePlannerScreenState();
     const generatedState = applyRoutePlanResponse(initialState, response);
 
-    expect(generatedState.planId).toBe("mock-route-plan-1778889600000");
+    expect(generatedState.planId).toBe("mock-route-plan");
+    expect(generatedState.accessToken).toBe("mock-route-access-token");
     expect(generatedState.routes).toHaveLength(5);
     expect(generatedState.selectedRouteId).toBe(response.candidates[0]?.id);
 

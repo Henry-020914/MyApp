@@ -108,7 +108,10 @@ describe("RouteGenerationService", () => {
       new Date("2026-05-16T00:00:00.000Z")
     );
 
-    expect(response.planId).toBe("route-plan-skeleton-1778889600000");
+    expect(response.planId).toMatch(
+      /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/
+    );
+    expect(response.accessToken).toHaveLength(43);
     expect(response.origin).toEqual(baseRequest.origin);
     expect(response.candidates).toHaveLength(5);
     expect(response.candidates[0]).toMatchObject({

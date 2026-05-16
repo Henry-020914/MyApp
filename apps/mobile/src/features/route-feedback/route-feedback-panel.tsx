@@ -15,6 +15,8 @@ import {
 
 type RouteFeedbackPanelProps = {
   route?: RouteCandidate;
+  planId?: string;
+  accessToken?: string;
   submitting: boolean;
   message?: string;
   error?: string;
@@ -23,6 +25,8 @@ type RouteFeedbackPanelProps = {
 
 export function RouteFeedbackPanel({
   route,
+  planId,
+  accessToken,
   submitting,
   message,
   error,
@@ -36,9 +40,9 @@ export function RouteFeedbackPanel({
     setRating("neutral");
     setTags([]);
     setComment("");
-  }, [route?.id]);
+  }, [route?.id, planId]);
 
-  if (!route) {
+  if (!route || !planId || !accessToken) {
     return null;
   }
 
@@ -119,7 +123,14 @@ export function RouteFeedbackPanel({
         disabled={submitting}
         onPress={() =>
           onSubmit(
-            buildRouteFeedbackRequest(route.id, rating, tags, comment)
+            buildRouteFeedbackRequest(
+              planId,
+              accessToken,
+              route.id,
+              rating,
+              tags,
+              comment
+            )
           )
         }
         style={({ pressed }) => ({

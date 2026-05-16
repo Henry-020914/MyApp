@@ -4,6 +4,7 @@ create extension if not exists pgcrypto;
 create table if not exists public.route_plans (
   id uuid primary key default gen_random_uuid(),
   client_plan_id text not null unique,
+  access_token text not null,
   origin geography(point, 4326) not null,
   origin_label text,
   target_type text not null check (target_type in ('distance', 'time')),
@@ -82,6 +83,7 @@ declare
 begin
   insert into public.route_plans (
     client_plan_id,
+    access_token,
     origin,
     origin_label,
     target_type,
@@ -95,6 +97,7 @@ begin
   )
   values (
     input_response ->> 'planId',
+    input_response ->> 'accessToken',
     st_setsrid(
       st_makepoint(
         (input_response #>> '{origin,lng}')::double precision,
@@ -113,6 +116,7 @@ begin
     (input_response ->> 'generatedAt')::timestamptz
   )
   on conflict (client_plan_id) do update set
+    access_token = excluded.access_token,
     origin = excluded.origin,
     origin_label = excluded.origin_label,
     target_type = excluded.target_type,
@@ -162,13 +166,17 @@ begin
 end;
 $$;
 
-create or replace function public.get_route_plan(input_plan_id text)
+create or replace function public.get_route_plan(
+  input_plan_id text,
+  input_access_token text
+)
 returns jsonb
 language sql
 stable
 as $$
   select jsonb_build_object(
     'planId', route_plans.client_plan_id,
+    'accessToken', route_plans.access_token,
     'origin', jsonb_strip_nulls(jsonb_build_object(
       'lat', st_y(route_plans.origin::geometry),
       'lng', st_x(route_plans.origin::geometry),
@@ -202,5 +210,6 @@ as $$
     from public.route_candidates
     where route_candidates.plan_id = route_plans.id
   ) as candidate_list on true
-  where route_plans.client_plan_id = input_plan_id;
+  where route_plans.client_plan_id = input_plan_id
+    and route_plans.access_token = input_access_token;
 $$;

@@ -42,4 +42,13 @@ describe("Phase 10 migration", () => {
     );
     expect(migrationSql).toContain("st_geomfromgeojson");
   });
+
+  it("stores and checks route plan access tokens", () => {
+    expect(migrationSql).toContain("access_token text not null");
+    expect(migrationSql).toContain("input_response ->> 'accessToken'");
+    expect(migrationSql).toContain("input_access_token text");
+    expect(migrationSql).toContain(
+      "route_plans.access_token = input_access_token"
+    );
+  });
 });

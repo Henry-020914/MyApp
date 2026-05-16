@@ -6,6 +6,7 @@ import {
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   createRoutePlan,
+  getRoutePlan,
   getRoute5ApiBaseUrl,
   submitRouteFeedback
 } from "../src/lib/route5-api";
@@ -29,6 +30,8 @@ const routePlanRequest: RoutePlanRequest = {
 };
 
 const routeFeedbackRequest: RouteFeedbackRequest = {
+  planId: "route-plan-1",
+  accessToken: "route-plan-access-token-1",
   routeCandidateId: "candidate-1",
   rating: "good",
   tags: ["nice_view"],
@@ -104,6 +107,39 @@ describe("route5 api client", () => {
       status: 400,
       code: "invalid_route_plan_request"
     });
+  });
+
+  it("gets a route plan with its access token", async () => {
+    const responseBody = buildMockRoutePlanResponse(
+      routePlanRequest,
+      new Date("2026-05-16T00:00:00.000Z")
+    );
+    const fetchMock = vi.fn(async () => {
+      return new Response(JSON.stringify(responseBody), {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
+    });
+
+    vi.stubGlobal("fetch", fetchMock);
+
+    const response = await getRoutePlan(
+      responseBody.planId,
+      responseBody.accessToken,
+      "http://127.0.0.1:3000"
+    );
+
+    expect(response).toEqual(responseBody);
+    expect(fetchMock).toHaveBeenCalledWith(
+      `http://127.0.0.1:3000/api/route-plans/${responseBody.planId}`,
+      expect.objectContaining({
+        headers: {
+          "x-route5-plan-token": responseBody.accessToken
+        }
+      })
+    );
   });
 
   it("posts route feedback and returns the receipt", async () => {

@@ -5,6 +5,8 @@ import {
 } from "../src";
 
 const validFeedback: RouteFeedbackRequest = {
+  planId: "route-plan-1",
+  accessToken: "route-plan-access-token-1",
   routeCandidateId: "candidate-1",
   rating: "good",
   tags: ["nice_view", "want_again"],
@@ -38,6 +40,8 @@ describe("routeFeedbackRequestSchema", () => {
 
   it("keeps comment optional", () => {
     const result = routeFeedbackRequestSchema.safeParse({
+      planId: "route-plan-1",
+      accessToken: "route-plan-access-token-1",
       routeCandidateId: "candidate-1",
       rating: "neutral",
       tags: []

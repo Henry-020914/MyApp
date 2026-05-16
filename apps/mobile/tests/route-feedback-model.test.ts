@@ -18,12 +18,16 @@ describe("route feedback model", () => {
   it("builds a feedback request with a trimmed comment", () => {
     expect(
       buildRouteFeedbackRequest(
+        "route-plan-1",
+        "route-plan-access-token-1",
         "candidate-1",
         "good",
         ["nice_view"],
         "  よかったです。  "
       )
     ).toEqual({
+      planId: "route-plan-1",
+      accessToken: "route-plan-access-token-1",
       routeCandidateId: "candidate-1",
       rating: "good",
       tags: ["nice_view"],
@@ -33,8 +37,17 @@ describe("route feedback model", () => {
 
   it("omits an empty comment", () => {
     expect(
-      buildRouteFeedbackRequest("candidate-1", "neutral", [], "   ")
+      buildRouteFeedbackRequest(
+        "route-plan-1",
+        "route-plan-access-token-1",
+        "candidate-1",
+        "neutral",
+        [],
+        "   "
+      )
     ).toEqual({
+      planId: "route-plan-1",
+      accessToken: "route-plan-access-token-1",
       routeCandidateId: "candidate-1",
       rating: "neutral",
       tags: []

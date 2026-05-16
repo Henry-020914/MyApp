@@ -55,6 +55,7 @@ export type RoutePlanRequest = {
 
 export type RoutePlanResponse = {
   planId: string;
+  accessToken: string;
   origin: GeoPoint;
   candidates: RouteCandidate[];
   warnings: string[];
@@ -76,6 +77,8 @@ export const routeFeedbackTags = [
 export type RouteFeedbackTag = (typeof routeFeedbackTags)[number];
 
 export type RouteFeedbackRequest = {
+  planId: string;
+  accessToken: string;
   routeCandidateId: string;
   rating: RouteFeedbackRating;
   tags: RouteFeedbackTag[];
@@ -176,6 +179,8 @@ export const routePlanRequestSchema = z
 
 export const routeFeedbackRequestSchema = z
   .object({
+    planId: z.string().trim().min(1).max(120),
+    accessToken: z.string().trim().min(20).max(256),
     routeCandidateId: z.string().trim().min(1).max(120),
     rating: z.enum(routeFeedbackRatings),
     tags: z.array(z.enum(routeFeedbackTags)).max(routeFeedbackTags.length),
@@ -446,7 +451,8 @@ export const buildMockRoutePlanResponse = (
   request: RoutePlanRequest,
   generatedAt = new Date()
 ): RoutePlanResponse => ({
-  planId: `mock-route-plan-${generatedAt.getTime()}`,
+  planId: "mock-route-plan",
+  accessToken: "mock-route-access-token",
   origin: request.origin,
   candidates: mockRoutePlanCandidates.slice(0, request.routeCount),
   warnings: [

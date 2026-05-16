@@ -35,6 +35,8 @@ export const toggleFeedbackTag = (
     : [...selectedTags, tag];
 
 export const buildRouteFeedbackRequest = (
+  planId: string,
+  accessToken: string,
   routeCandidateId: string,
   rating: RouteFeedbackRating,
   tags: RouteFeedbackTag[],
@@ -43,6 +45,8 @@ export const buildRouteFeedbackRequest = (
   const trimmedComment = comment.trim();
 
   return {
+    planId,
+    accessToken,
     routeCandidateId,
     rating,
     tags,

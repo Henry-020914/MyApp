@@ -9,6 +9,7 @@ import type {
   RoutePlanResponse,
   RouteScores
 } from "@route5/shared";
+import { randomBytes, randomUUID } from "node:crypto";
 import { RouteExplanationService } from "../explanation";
 
 type RouteGenerationTheme = RoutePlanPreference;
@@ -278,7 +279,8 @@ export class RouteGenerationService {
     const plan = this.buildPlan(request);
 
     return {
-      planId: `route-plan-skeleton-${generatedAt.getTime()}`,
+      planId: randomUUID(),
+      accessToken: randomBytes(32).toString("base64url"),
       origin: request.origin,
       candidates: plan.candidates.map((candidate) =>
         toRouteCandidate(candidate, request)

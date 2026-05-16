@@ -27,6 +27,7 @@ const request: RoutePlanRequest = {
 
 const response: RoutePlanResponse = {
   planId: "route-plan-skeleton-test",
+  accessToken: "route-plan-access-token-test",
   origin: request.origin,
   candidates: [
     {
@@ -76,15 +77,30 @@ describe("InMemoryRoutePlanRepository", () => {
       savedAt: "2026-05-16T00:00:01.000Z"
     });
 
-    await expect(repository.getRoutePlan(response.planId)).resolves.toEqual(
-      response
-    );
+    await expect(
+      repository.getRoutePlan(response.planId, response.accessToken)
+    ).resolves.toEqual(response);
   });
 
   it("returns null when a route plan is missing", async () => {
     const repository = new InMemoryRoutePlanRepository();
 
-    await expect(repository.getRoutePlan("missing-plan")).resolves.toBeNull();
+    await expect(
+      repository.getRoutePlan("missing-plan", response.accessToken)
+    ).resolves.toBeNull();
+  });
+
+  it("returns null when the access token is wrong", async () => {
+    const repository = new InMemoryRoutePlanRepository();
+    await repository.saveRoutePlan({
+      request,
+      response,
+      savedAt: "2026-05-16T00:00:01.000Z"
+    });
+
+    await expect(
+      repository.getRoutePlan(response.planId, "wrong-route-plan-access-token")
+    ).resolves.toBeNull();
   });
 
   it("returns a defensive copy so callers cannot mutate saved data", async () => {
@@ -95,10 +111,16 @@ describe("InMemoryRoutePlanRepository", () => {
       savedAt: "2026-05-16T00:00:01.000Z"
     });
 
-    const firstRead = await repository.getRoutePlan(response.planId);
+    const firstRead = await repository.getRoutePlan(
+      response.planId,
+      response.accessToken
+    );
     firstRead?.candidates[0]?.labels.push("Mutated label");
 
-    const secondRead = await repository.getRoutePlan(response.planId);
+    const secondRead = await repository.getRoutePlan(
+      response.planId,
+      response.accessToken
+    );
 
     expect(secondRead?.candidates[0]?.labels).toEqual(["Test label"]);
   });
@@ -137,9 +159,9 @@ describe("SupabaseRoutePlanRepository", () => {
       response,
       savedAt: "2026-05-16T00:00:01.000Z"
     });
-    await expect(repository.getRoutePlan(response.planId)).resolves.toEqual(
-      response
-    );
+    await expect(
+      repository.getRoutePlan(response.planId, response.accessToken)
+    ).resolves.toEqual(response);
 
     expect(requests[0]?.input).toBe(
       "https://example.supabase.co/rest/v1/rpc/save_route_plan"
@@ -157,7 +179,8 @@ describe("SupabaseRoutePlanRepository", () => {
       }
     });
     expect(JSON.parse(String(requests[1]?.init.body))).toEqual({
-      input_plan_id: response.planId
+      input_plan_id: response.planId,
+      input_access_token: response.accessToken
     });
   });
 

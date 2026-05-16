@@ -17,12 +17,25 @@ export class Route5ApiError extends Error {
 }
 
 const defaultApiBaseUrl = "http://127.0.0.1:3000";
+const routePlanAccessTokenHeader = "x-route5-plan-token";
 
 export const getRoute5ApiBaseUrl = () =>
   (process.env.EXPO_PUBLIC_ROUTE5_API_URL ?? defaultApiBaseUrl).replace(
     /\/$/,
     ""
   );
+
+const toRoute5ApiError = (
+  error: unknown,
+  fallbackMessage: string,
+  fallbackCode: string
+) => {
+  if (error instanceof Route5ApiError) {
+    return error;
+  }
+
+  return new Route5ApiError(fallbackMessage, 0, fallbackCode);
+};
 
 export const createRoutePlan = async (
   request: RoutePlanRequest,
@@ -41,7 +54,7 @@ export const createRoutePlan = async (
 
     if (!response.ok) {
       throw new Route5ApiError(
-        body?.message ?? "ルート生成に失敗しました。",
+        body?.message ?? "Route plan creation failed.",
         response.status,
         body?.error
       );
@@ -49,13 +62,41 @@ export const createRoutePlan = async (
 
     return body as RoutePlanResponse;
   } catch (error) {
-    if (error instanceof Route5ApiError) {
-      throw error;
+    throw toRoute5ApiError(
+      error,
+      "Could not connect to the Route5 API.",
+      "NETWORK_ERROR"
+    );
+  }
+};
+
+export const getRoutePlan = async (
+  planId: string,
+  accessToken: string,
+  baseUrl = getRoute5ApiBaseUrl()
+): Promise<RoutePlanResponse> => {
+  try {
+    const response = await fetch(`${baseUrl}/api/route-plans/${planId}`, {
+      headers: {
+        [routePlanAccessTokenHeader]: accessToken
+      }
+    });
+
+    const body = await response.json().catch(() => null);
+
+    if (!response.ok) {
+      throw new Route5ApiError(
+        body?.message ?? "Route plan retrieval failed.",
+        response.status,
+        body?.error
+      );
     }
 
-    throw new Route5ApiError(
-      "APIに接続できません。APIサーバーが起動しているか確認してください。",
-      0,
+    return body as RoutePlanResponse;
+  } catch (error) {
+    throw toRoute5ApiError(
+      error,
+      "Could not connect to the Route5 API.",
       "NETWORK_ERROR"
     );
   }
@@ -78,7 +119,7 @@ export const submitRouteFeedback = async (
 
     if (!response.ok) {
       throw new Route5ApiError(
-        body?.message ?? "フィードバック送信に失敗しました。",
+        body?.message ?? "Route feedback submission failed.",
         response.status,
         body?.error
       );
@@ -86,13 +127,9 @@ export const submitRouteFeedback = async (
 
     return body as RouteFeedbackResponse;
   } catch (error) {
-    if (error instanceof Route5ApiError) {
-      throw error;
-    }
-
-    throw new Route5ApiError(
-      "APIに接続できません。APIサーバーが起動しているか確認してください。",
-      0,
+    throw toRoute5ApiError(
+      error,
+      "Could not connect to the Route5 API.",
       "NETWORK_ERROR"
     );
   }

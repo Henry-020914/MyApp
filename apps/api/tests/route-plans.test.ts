@@ -43,7 +43,10 @@ describe("POST /api/route-plans", () => {
 
     expect(response.statusCode).toBe(200);
     expect(body.origin).toEqual(validRoutePlanRequest.origin);
-    expect(body.planId).toContain("route-plan-skeleton");
+    expect(body.planId).toMatch(
+      /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/
+    );
+    expect(body.accessToken).toHaveLength(43);
     expect(body.candidates).toHaveLength(5);
     expect(body.candidates[0]?.geometry.type).toBe("LineString");
     expect(body.candidates[0]?.confidence).toBe("low");
@@ -60,11 +63,38 @@ describe("POST /api/route-plans", () => {
 
     const getResponse = await app.inject({
       method: "GET",
-      url: `/api/route-plans/${created.planId}`
+      url: `/api/route-plans/${created.planId}`,
+      headers: {
+        "x-route5-plan-token": created.accessToken
+      }
     });
 
     expect(getResponse.statusCode).toBe(200);
     expect(getResponse.json<RoutePlanResponse>()).toEqual(created);
+  });
+
+  it("hides a saved route plan when the access token is missing or wrong", async () => {
+    const postResponse = await app.inject({
+      method: "POST",
+      url: "/api/route-plans",
+      payload: validRoutePlanRequest
+    });
+    const created = postResponse.json<RoutePlanResponse>();
+
+    const missingTokenResponse = await app.inject({
+      method: "GET",
+      url: `/api/route-plans/${created.planId}`
+    });
+    const wrongTokenResponse = await app.inject({
+      method: "GET",
+      url: `/api/route-plans/${created.planId}`,
+      headers: {
+        "x-route5-plan-token": "wrong-route-plan-access-token"
+      }
+    });
+
+    expect(missingTokenResponse.statusCode).toBe(404);
+    expect(wrongTokenResponse.statusCode).toBe(404);
   });
 
   it("returns a 404 response when a saved route plan does not exist", async () => {

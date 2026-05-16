@@ -11,6 +11,8 @@ import {
 } from "../src/services/persistence";
 
 const feedback: RouteFeedbackRequest = {
+  planId: "route-plan-1",
+  accessToken: "route-plan-access-token-1",
   routeCandidateId: "candidate-1",
   rating: "good",
   tags: ["nice_view", "want_again"],

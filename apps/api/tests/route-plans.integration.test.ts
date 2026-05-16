@@ -52,7 +52,10 @@ describe("Route plan API integration behavior", () => {
 
       const getResponse = await app.inject({
         method: "GET",
-        url: `/api/route-plans/${created.planId}`
+        url: `/api/route-plans/${created.planId}`,
+        headers: {
+          "x-route5-plan-token": created.accessToken
+        }
       });
 
       expect(getResponse.statusCode).toBe(200);
@@ -133,7 +136,10 @@ describe("Route plan API integration behavior", () => {
 
     const getResponse = await app.inject({
       method: "GET",
-      url: "/api/route-plans/partial-route-plan"
+      url: "/api/route-plans/partial-route-plan",
+      headers: {
+        "x-route5-plan-token": created.accessToken
+      }
     });
 
     await app.close();

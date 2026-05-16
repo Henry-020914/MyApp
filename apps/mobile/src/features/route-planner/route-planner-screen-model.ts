@@ -9,6 +9,7 @@ export type RoutePlannerScreenState = {
   selectedRouteId?: string;
   warnings: string[];
   planId?: string;
+  accessToken?: string;
   feedbackMessage?: string;
   feedbackError?: string;
 };
@@ -29,6 +30,7 @@ export const applyRoutePlanResponse = (
   selectedRouteId: response.candidates[0]?.id,
   warnings: response.warnings,
   planId: response.planId,
+  accessToken: response.accessToken,
   feedbackMessage: undefined,
   feedbackError: undefined
 });

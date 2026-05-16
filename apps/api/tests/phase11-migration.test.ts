@@ -25,8 +25,12 @@ describe("Phase 11 migration", () => {
     expect(migrationSql).toContain("comment");
   });
 
-  it("connects client candidate ids to stored route candidates", () => {
+  it("connects plan-scoped candidate ids to stored route candidates", () => {
     expect(migrationSql).toContain("route_candidates.candidate_id");
     expect(migrationSql).toContain("input_feedback ->> 'routeCandidateId'");
+    expect(migrationSql).toContain("route_plans.client_plan_id");
+    expect(migrationSql).toContain("input_feedback ->> 'planId'");
+    expect(migrationSql).toContain("route_plans.access_token");
+    expect(migrationSql).toContain("input_feedback ->> 'accessToken'");
   });
 });

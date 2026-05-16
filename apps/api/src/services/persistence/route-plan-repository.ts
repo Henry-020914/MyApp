@@ -8,7 +8,10 @@ export type StoredRoutePlan = {
 
 export type RoutePlanRepository = {
   saveRoutePlan(routePlan: StoredRoutePlan): Promise<void>;
-  getRoutePlan(planId: string): Promise<RoutePlanResponse | null>;
+  getRoutePlan(
+    planId: string,
+    accessToken: string
+  ): Promise<RoutePlanResponse | null>;
 };
 
 export class InMemoryRoutePlanRepository implements RoutePlanRepository {
@@ -18,10 +21,14 @@ export class InMemoryRoutePlanRepository implements RoutePlanRepository {
     this.routePlans.set(routePlan.response.planId, clone(routePlan));
   }
 
-  async getRoutePlan(planId: string) {
+  async getRoutePlan(planId: string, accessToken: string) {
     const routePlan = this.routePlans.get(planId);
 
-    return routePlan ? clone(routePlan.response) : null;
+    if (!routePlan || routePlan.response.accessToken !== accessToken) {
+      return null;
+    }
+
+    return clone(routePlan.response);
   }
 }
 
@@ -58,9 +65,10 @@ export class SupabaseRoutePlanRepository implements RoutePlanRepository {
     });
   }
 
-  async getRoutePlan(planId: string) {
+  async getRoutePlan(planId: string, accessToken: string) {
     return this.callRpc<RoutePlanResponse | null>("get_route_plan", {
-      input_plan_id: planId
+      input_plan_id: planId,
+      input_access_token: accessToken
     });
   }
 

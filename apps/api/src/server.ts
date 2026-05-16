@@ -7,6 +7,7 @@ import type {
   RouteFeedbackRepository,
   RoutePlanRepository
 } from "./services/persistence";
+import { createRoutePlanRepositoryFromEnv } from "./services/persistence";
 import type { RoutePlanResponseBuilder } from "./services/route-generation";
 
 export type BuildServerOptions = {
@@ -19,14 +20,17 @@ export const buildServer = async (options: BuildServerOptions = {}) => {
   const app = Fastify({
     logger: true
   });
+  const routePlanRepository =
+    options.routePlanRepository ?? createRoutePlanRepositoryFromEnv();
 
   await registerHealthRoute(app);
   await registerRoutePlanRoutes(app, {
     routeGenerationService: options.routeGenerationService,
-    routePlanRepository: options.routePlanRepository
+    routePlanRepository
   });
   await registerRouteFeedbackRoute(app, {
-    routeFeedbackRepository: options.routeFeedbackRepository
+    routeFeedbackRepository: options.routeFeedbackRepository,
+    routePlanRepository
   });
 
   app.get("/api/mock-routes", async () => ({
