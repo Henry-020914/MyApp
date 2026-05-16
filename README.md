@@ -98,3 +98,12 @@ Use `pnpm dev:mobile` to start Expo from the mobile package. Avoid using `pnpm e
 - Route generation responses use the explanation service for candidate descriptions, labels, and cautions.
 - The generated wording avoids expressions that look like safety guarantees.
 - Explanation behavior is covered by unit tests.
+
+## Phase 10 Acceptance
+
+- `supabase/migrations` contains SQL for `route_plans`, `route_candidates`, `saved_routes`, and `route_feedback`.
+- The migration enables PostGIS and uses geography columns for origins and route lines.
+- The API has a route plan repository interface, an in-memory implementation for local development and tests, and a Supabase RPC implementation for configured environments.
+- `POST /api/route-plans` saves the generated route plan through the repository.
+- `GET /api/route-plans/:planId` returns a saved route plan or `404` when it is missing.
+- Repository behavior, API retrieval, and migration coverage are covered by unit tests.

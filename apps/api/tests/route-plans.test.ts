@@ -50,6 +50,35 @@ describe("POST /api/route-plans", () => {
     expect(body.warnings.length).toBeGreaterThan(0);
   });
 
+  it("saves the generated route plan and returns it by plan id", async () => {
+    const postResponse = await app.inject({
+      method: "POST",
+      url: "/api/route-plans",
+      payload: validRoutePlanRequest
+    });
+    const created = postResponse.json<RoutePlanResponse>();
+
+    const getResponse = await app.inject({
+      method: "GET",
+      url: `/api/route-plans/${created.planId}`
+    });
+
+    expect(getResponse.statusCode).toBe(200);
+    expect(getResponse.json<RoutePlanResponse>()).toEqual(created);
+  });
+
+  it("returns a 404 response when a saved route plan does not exist", async () => {
+    const response = await app.inject({
+      method: "GET",
+      url: "/api/route-plans/missing-plan"
+    });
+
+    expect(response.statusCode).toBe(404);
+    expect(response.json()).toMatchObject({
+      error: "route_plan_not_found"
+    });
+  });
+
   it("returns a 400 response when the request is invalid", async () => {
     const response = await app.inject({
       method: "POST",

@@ -1,9 +1,22 @@
 import type { FastifyInstance } from "fastify";
 import { routePlanRequestSchema } from "@route5/shared";
+import {
+  createRoutePlanRepositoryFromEnv,
+  type RoutePlanRepository
+} from "../services/persistence";
 import { RouteGenerationService } from "../services/route-generation";
 
-export const registerRoutePlanRoutes = async (app: FastifyInstance) => {
+export type RegisterRoutePlanRoutesOptions = {
+  routePlanRepository?: RoutePlanRepository;
+};
+
+export const registerRoutePlanRoutes = async (
+  app: FastifyInstance,
+  options: RegisterRoutePlanRoutesOptions = {}
+) => {
   const routeGenerationService = new RouteGenerationService();
+  const routePlanRepository =
+    options.routePlanRepository ?? createRoutePlanRepositoryFromEnv();
 
   app.post("/api/route-plans", async (request, reply) => {
     const validation = routePlanRequestSchema.safeParse(request.body);
@@ -19,8 +32,33 @@ export const registerRoutePlanRoutes = async (app: FastifyInstance) => {
       });
     }
 
-    return reply
-      .status(200)
-      .send(routeGenerationService.buildRoutePlanResponse(validation.data));
+    const response = routeGenerationService.buildRoutePlanResponse(
+      validation.data
+    );
+    await routePlanRepository.saveRoutePlan({
+      request: validation.data,
+      response,
+      savedAt: new Date().toISOString()
+    });
+
+    return reply.status(200).send(response);
   });
+
+  app.get<{ Params: { planId: string } }>(
+    "/api/route-plans/:planId",
+    async (request, reply) => {
+      const routePlan = await routePlanRepository.getRoutePlan(
+        request.params.planId
+      );
+
+      if (!routePlan) {
+        return reply.status(404).send({
+          error: "route_plan_not_found",
+          message: "Route plan was not found."
+        });
+      }
+
+      return reply.status(200).send(routePlan);
+    }
+  );
 };
