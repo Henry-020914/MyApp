@@ -80,3 +80,12 @@ Use `pnpm dev:mobile` to start Expo from the mobile package. Avoid using `pnpm e
 - Requests include `extra_info` for `steepness`, `surface`, `waytype`, `green`, and `noise`.
 - The API key is sent only in the backend request header, not in the URL or request body.
 - Provider request creation, response parsing, and error handling are covered by unit tests with mocked network calls.
+
+## Phase 8 Acceptance
+
+- The API has `RouteScoringService` under `apps/api/src/services/scoring`.
+- The service calculates distance fit, level fit, slope, surface, park and water, shade, safety proxy, quietness, and uniqueness signals.
+- Beginner scoring strongly penalizes steep and unpaved routes.
+- Hill training scoring rewards routes with enough ascent when requested.
+- The service returns `RouteScores` compatible with shared route candidates plus a detailed scoring breakdown.
+- Scoring behavior is covered by unit tests.
