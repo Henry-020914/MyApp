@@ -1,11 +1,13 @@
 import {
   buildMockRoutePlanResponse,
+  type RouteFeedbackRequest,
   type RoutePlanRequest
 } from "@route5/shared";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   createRoutePlan,
-  getRoute5ApiBaseUrl
+  getRoute5ApiBaseUrl,
+  submitRouteFeedback
 } from "../src/lib/route5-api";
 
 const routePlanRequest: RoutePlanRequest = {
@@ -24,6 +26,13 @@ const routePlanRequest: RoutePlanRequest = {
   preferences: ["flat", "park"],
   routeCount: 5,
   locale: "ja-JP"
+};
+
+const routeFeedbackRequest: RouteFeedbackRequest = {
+  routeCandidateId: "candidate-1",
+  rating: "good",
+  tags: ["nice_view"],
+  comment: "気持ちよく歩けました。"
 };
 
 describe("route5 api client", () => {
@@ -94,6 +103,65 @@ describe("route5 api client", () => {
       message: "入力内容を確認してください。",
       status: 400,
       code: "invalid_route_plan_request"
+    });
+  });
+
+  it("posts route feedback and returns the receipt", async () => {
+    const responseBody = {
+      feedbackId: "route-feedback-1",
+      receivedAt: "2026-05-16T00:00:00.000Z"
+    };
+    const fetchMock = vi.fn(async () => {
+      return new Response(JSON.stringify(responseBody), {
+        status: 201,
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
+    });
+
+    vi.stubGlobal("fetch", fetchMock);
+
+    const response = await submitRouteFeedback(
+      routeFeedbackRequest,
+      "http://127.0.0.1:3000"
+    );
+
+    expect(response).toEqual(responseBody);
+    expect(fetchMock).toHaveBeenCalledWith(
+      "http://127.0.0.1:3000/api/route-feedback",
+      expect.objectContaining({
+        method: "POST",
+        body: JSON.stringify(routeFeedbackRequest)
+      })
+    );
+  });
+
+  it("throws a readable error for invalid feedback responses", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => {
+        return new Response(
+          JSON.stringify({
+            error: "invalid_route_feedback_request",
+            message: "感想の入力内容を確認してください。"
+          }),
+          {
+            status: 400,
+            headers: {
+              "Content-Type": "application/json"
+            }
+          }
+        );
+      })
+    );
+
+    await expect(
+      submitRouteFeedback(routeFeedbackRequest, "http://127.0.0.1:3000")
+    ).rejects.toMatchObject({
+      message: "感想の入力内容を確認してください。",
+      status: 400,
+      code: "invalid_route_feedback_request"
     });
   });
 });

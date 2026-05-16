@@ -61,6 +61,32 @@ export type RoutePlanResponse = {
   generatedAt: string;
 };
 
+export const routeFeedbackRatings = ["good", "bad", "neutral"] as const;
+export type RouteFeedbackRating = (typeof routeFeedbackRatings)[number];
+
+export const routeFeedbackTags = [
+  "distance_wrong",
+  "too_hilly",
+  "blocked",
+  "felt_unsafe",
+  "nice_view",
+  "good_for_beginner",
+  "want_again"
+] as const;
+export type RouteFeedbackTag = (typeof routeFeedbackTags)[number];
+
+export type RouteFeedbackRequest = {
+  routeCandidateId: string;
+  rating: RouteFeedbackRating;
+  tags: RouteFeedbackTag[];
+  comment?: string;
+};
+
+export type RouteFeedbackResponse = {
+  feedbackId: string;
+  receivedAt: string;
+};
+
 export type RouteCandidate = {
   id: string;
   name: string;
@@ -145,6 +171,15 @@ export const routePlanRequestSchema = z
     preferences: z.array(z.enum(routePlanPreferences)).max(8),
     routeCount: z.literal(5),
     locale: z.literal("ja-JP")
+  })
+  .strict();
+
+export const routeFeedbackRequestSchema = z
+  .object({
+    routeCandidateId: z.string().trim().min(1).max(120),
+    rating: z.enum(routeFeedbackRatings),
+    tags: z.array(z.enum(routeFeedbackTags)).max(routeFeedbackTags.length),
+    comment: z.string().trim().min(1).max(500).optional()
   })
   .strict();
 

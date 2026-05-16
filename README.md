@@ -2,7 +2,7 @@
 
 Route5 is the foundation for a mobile app that will suggest five loop routes for walking, jogging, or running.
 
-The current implementation still uses mock route data. Real map rendering, OpenRouteService integration, Supabase/PostGIS persistence, route generation, saved routes, and feedback submission are later phases.
+The current implementation still uses temporary route generation. Saved routes, authentication, live Supabase deployment, and using feedback to improve future route generation are later phases.
 
 ## Workspace
 
@@ -107,3 +107,13 @@ Use `pnpm dev:mobile` to start Expo from the mobile package. Avoid using `pnpm e
 - `POST /api/route-plans` saves the generated route plan through the repository.
 - `GET /api/route-plans/:planId` returns a saved route plan or `404` when it is missing.
 - Repository behavior, API retrieval, and migration coverage are covered by unit tests.
+
+## Phase 11 Acceptance
+
+- `packages/shared` exports `RouteFeedbackRequest`, `RouteFeedbackResponse`, and a Zod schema for validating feedback.
+- The API exposes `POST /api/route-feedback`.
+- Valid feedback with `routeCandidateId`, `rating`, `tags`, and optional `comment` returns a receipt.
+- Feedback is saved through an in-memory repository for local development and tests.
+- Configured Supabase environments can call `save_route_feedback`.
+- The mobile app has a simple feedback panel for the selected route candidate.
+- Validation, API behavior, persistence behavior, API client behavior, and mobile request creation are covered by unit tests.

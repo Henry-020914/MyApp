@@ -1,4 +1,9 @@
-import type { RoutePlanRequest, RoutePlanResponse } from "@route5/shared";
+import type {
+  RouteFeedbackRequest,
+  RouteFeedbackResponse,
+  RoutePlanRequest,
+  RoutePlanResponse
+} from "@route5/shared";
 
 export class Route5ApiError extends Error {
   constructor(
@@ -43,6 +48,43 @@ export const createRoutePlan = async (
     }
 
     return body as RoutePlanResponse;
+  } catch (error) {
+    if (error instanceof Route5ApiError) {
+      throw error;
+    }
+
+    throw new Route5ApiError(
+      "APIに接続できません。APIサーバーが起動しているか確認してください。",
+      0,
+      "NETWORK_ERROR"
+    );
+  }
+};
+
+export const submitRouteFeedback = async (
+  request: RouteFeedbackRequest,
+  baseUrl = getRoute5ApiBaseUrl()
+): Promise<RouteFeedbackResponse> => {
+  try {
+    const response = await fetch(`${baseUrl}/api/route-feedback`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(request)
+    });
+
+    const body = await response.json().catch(() => null);
+
+    if (!response.ok) {
+      throw new Route5ApiError(
+        body?.message ?? "フィードバック送信に失敗しました。",
+        response.status,
+        body?.error
+      );
+    }
+
+    return body as RouteFeedbackResponse;
   } catch (error) {
     if (error instanceof Route5ApiError) {
       throw error;

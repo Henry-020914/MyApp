@@ -1,8 +1,13 @@
-import { mockRouteCandidates, type RouteCandidate } from "@route5/shared";
+import {
+  mockRouteCandidates,
+  type RouteCandidate,
+  type RouteFeedbackRequest
+} from "@route5/shared";
 import { useState } from "react";
 import { ScrollView, Text, View } from "react-native";
 import { RouteCandidateCard } from "../../components/route-candidate-card";
-import { createRoutePlan } from "../../lib/route5-api";
+import { createRoutePlan, submitRouteFeedback } from "../../lib/route5-api";
+import { RouteFeedbackPanel } from "../route-feedback/route-feedback-panel";
 import { RouteMap } from "../route-map/route-map";
 import { RoutePlannerForm } from "./route-planner-form";
 import {
@@ -20,6 +25,11 @@ export function RoutePlannerScreen() {
   const [warnings, setWarnings] = useState<string[]>([]);
   const [planId, setPlanId] = useState<string>();
   const [submitting, setSubmitting] = useState(false);
+  const [feedbackSubmitting, setFeedbackSubmitting] = useState(false);
+  const [feedbackMessage, setFeedbackMessage] = useState<string>();
+  const [feedbackError, setFeedbackError] = useState<string>();
+  const selectedRoute =
+    routes.find((route) => route.id === selectedRouteId) ?? routes[0];
 
   const handleSubmit = async () => {
     const formResult = toRoutePlanRequest(formValues);
@@ -39,6 +49,8 @@ export function RoutePlannerScreen() {
       setSelectedRouteId(response.candidates[0]?.id);
       setWarnings(response.warnings);
       setPlanId(response.planId);
+      setFeedbackMessage(undefined);
+      setFeedbackError(undefined);
     } catch (error) {
       setFormError(
         error instanceof Error
@@ -48,6 +60,32 @@ export function RoutePlannerScreen() {
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const handleFeedbackSubmit = async (feedback: RouteFeedbackRequest) => {
+    setFeedbackSubmitting(true);
+    setFeedbackMessage(undefined);
+    setFeedbackError(undefined);
+
+    try {
+      const response = await submitRouteFeedback(feedback);
+
+      setFeedbackMessage(`送信しました ID ${response.feedbackId}`);
+    } catch (error) {
+      setFeedbackError(
+        error instanceof Error
+          ? error.message
+          : "フィードバック送信に失敗しました。"
+      );
+    } finally {
+      setFeedbackSubmitting(false);
+    }
+  };
+
+  const handleSelectRoute = (routeId: string) => {
+    setSelectedRouteId(routeId);
+    setFeedbackMessage(undefined);
+    setFeedbackError(undefined);
   };
 
   return (
@@ -101,10 +139,18 @@ export function RoutePlannerScreen() {
             key={route.id}
             route={route}
             selected={route.id === selectedRouteId}
-            onPress={() => setSelectedRouteId(route.id)}
+            onPress={() => handleSelectRoute(route.id)}
           />
         ))}
       </View>
+
+      <RouteFeedbackPanel
+        route={selectedRoute}
+        submitting={feedbackSubmitting}
+        message={feedbackMessage}
+        error={feedbackError}
+        onSubmit={handleFeedbackSubmit}
+      />
 
       {warnings.length > 0 ? (
         <View style={{ gap: 4 }}>
