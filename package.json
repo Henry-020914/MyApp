@@ -9,6 +9,7 @@
   "scripts": {
     "dev:api": "corepack pnpm --filter @route5/api dev",
     "dev:mobile": "corepack pnpm --filter @route5/mobile start",
+    "dev:android-client": "corepack pnpm --filter @route5/mobile dev-client",
     "lint": "corepack pnpm -r lint",
     "typecheck": "corepack pnpm -r typecheck",
     "test": "corepack pnpm -r test"

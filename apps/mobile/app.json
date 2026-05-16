@@ -1,12 +1,24 @@
 {
   "expo": {
     "name": "Route5",
-    "slug": "route5",
+    "slug": "etuor5",
     "scheme": "route5",
     "version": "0.1.0",
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
-    "plugins": ["@maplibre/maplibre-react-native"]
+    "plugins": [
+      "@maplibre/maplibre-react-native"
+    ],
+    "android": {
+      "package": "com.route5.app",
+      "usesCleartextTraffic": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "89ee0d37-608f-445c-997c-fba074776706"
+      }
+    },
+    "owner": "route5.app"
   }
 }
