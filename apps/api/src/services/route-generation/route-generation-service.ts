@@ -9,6 +9,7 @@ import type {
   RoutePlanResponse,
   RouteScores
 } from "@route5/shared";
+import { RouteExplanationService } from "../explanation";
 
 type RouteGenerationTheme = RoutePlanPreference;
 
@@ -82,6 +83,8 @@ const routeThemes: RouteGenerationTheme[] = [
   "hill_training",
   "scenic"
 ];
+
+const routeExplanationService = new RouteExplanationService();
 
 const searchRadiusBands = [
   { targetDistanceM: 1_000, radiusM: 300 },
@@ -325,11 +328,18 @@ const toRouteCandidate = (
   request: RoutePlanRequest
 ): RouteCandidate => {
   const text = themeText[candidate.theme];
+  const metrics = buildMetrics(candidate.theme);
+  const scores = buildScores(candidate.theme, candidate.score);
+  const explanation = routeExplanationService.explainRoute({
+    scores,
+    metrics,
+    confidence: "low"
+  });
 
   return {
     id: candidate.id,
     name: text.name,
-    description: text.description,
+    description: explanation.description,
     geometry: candidate.geometry,
     distanceM: Math.round(candidate.estimatedDistanceM),
     estimatedDurationSec: estimateDurationSec(
@@ -337,13 +347,10 @@ const toRouteCandidate = (
       request.activity,
       request.level
     ),
-    metrics: buildMetrics(candidate.theme),
-    scores: buildScores(candidate.theme, candidate.score),
-    labels: text.labels,
-    cautions: [
-      "外部API連携前の仮ルートです。",
-      "安全や通行可否を保証するものではありません。"
-    ],
+    metrics,
+    scores,
+    labels: explanation.labels,
+    cautions: explanation.cautions,
     confidence: "low"
   };
 };

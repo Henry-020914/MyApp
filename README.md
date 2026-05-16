@@ -89,3 +89,12 @@ Use `pnpm dev:mobile` to start Expo from the mobile package. Avoid using `pnpm e
 - Hill training scoring rewards routes with enough ascent when requested.
 - The service returns `RouteScores` compatible with shared route candidates plus a detailed scoring breakdown.
 - Scoring behavior is covered by unit tests.
+
+## Phase 9 Acceptance
+
+- The API has `RouteExplanationService` under `apps/api/src/services/explanation`.
+- The service creates Japanese descriptions, labels, and cautions from `RouteScores` and `RouteMetrics`.
+- Explanation text is template-based and does not use an LLM.
+- Route generation responses use the explanation service for candidate descriptions, labels, and cautions.
+- The generated wording avoids expressions that look like safety guarantees.
+- Explanation behavior is covered by unit tests.
