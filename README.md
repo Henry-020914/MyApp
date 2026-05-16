@@ -62,3 +62,12 @@ Use `pnpm dev:mobile` to start Expo from the mobile package. Avoid using `pnpm e
 - The returned candidates replace the map and card list.
 - Loading and error states are shown.
 - Form conversion and API client behavior are covered by unit tests.
+
+## Phase 6 Acceptance
+
+- The API has `RouteGenerationService` under `apps/api/src/services/route-generation`.
+- The service calculates `targetDistanceM` from distance or time input.
+- The service generates deterministic temporary intermediate points around the origin.
+- The service creates scored skeleton loop candidates without calling an external API.
+- `POST /api/route-plans` returns five low-confidence skeleton candidates.
+- Target distance, candidate generation, scoring, and response creation are covered by unit tests.

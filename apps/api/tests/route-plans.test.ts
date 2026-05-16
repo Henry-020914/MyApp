@@ -32,7 +32,7 @@ describe("POST /api/route-plans", () => {
     await app.close();
   });
 
-  it("returns five mock route candidates for a valid request", async () => {
+  it("returns five skeleton route candidates for a valid request", async () => {
     const response = await app.inject({
       method: "POST",
       url: "/api/route-plans",
@@ -43,8 +43,10 @@ describe("POST /api/route-plans", () => {
 
     expect(response.statusCode).toBe(200);
     expect(body.origin).toEqual(validRoutePlanRequest.origin);
+    expect(body.planId).toContain("route-plan-skeleton");
     expect(body.candidates).toHaveLength(5);
     expect(body.candidates[0]?.geometry.type).toBe("LineString");
+    expect(body.candidates[0]?.confidence).toBe("low");
     expect(body.warnings.length).toBeGreaterThan(0);
   });
 

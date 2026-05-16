@@ -1,10 +1,10 @@
 import type { FastifyInstance } from "fastify";
-import {
-  buildMockRoutePlanResponse,
-  routePlanRequestSchema
-} from "@route5/shared";
+import { routePlanRequestSchema } from "@route5/shared";
+import { RouteGenerationService } from "../services/route-generation";
 
 export const registerRoutePlanRoutes = async (app: FastifyInstance) => {
+  const routeGenerationService = new RouteGenerationService();
+
   app.post("/api/route-plans", async (request, reply) => {
     const validation = routePlanRequestSchema.safeParse(request.body);
 
@@ -21,6 +21,6 @@ export const registerRoutePlanRoutes = async (app: FastifyInstance) => {
 
     return reply
       .status(200)
-      .send(buildMockRoutePlanResponse(validation.data));
+      .send(routeGenerationService.buildRoutePlanResponse(validation.data));
   });
 };
